@@ -2,6 +2,38 @@
  * Create by Hansel on 2015-06-26 17:32:28.
  */
 
+/* 思路
+
+每个collection有一个hash前缀，在创建model的时候生成
+每个document的id由 hash前缀拼接上自增的serial组成
+
+比如 User, 对应 __yellow.collections['RKGG2KTG15J1K3A']
+然后每条document都有一个serial，比如19991
+那么它的id等于RKGG2KTG15J1K3A19991 == 'RKGG2KTG15J1K3A'+String(19991),
+
+示例数据：
+
+__yellow.collections['RKGG2KTG15J1K3A'] = {
+  RKGG2KTG15J1K3A19991: {
+    _id: RKGG2KTG15J1K3A19991,
+    _v: 0,
+    username: "test",
+    password: "g14gjfrj12kh2rhj12g313"
+  }
+}
+
+sort的时候，默认根据serial(如"19991")排序
+limit的时候，先验证是否undefined（是否被删除），再push到result
+findById的时候，直接验证undefined
+
+
+特殊情况：
+删除某条数据的时候，造成serial有断层，需要有serial_skip方法
+
+
+
+*/
+
 function yellow(){
 
 
@@ -10,8 +42,9 @@ function yellow(){
 
 var undefined
 var __yellow = {
-  collections: {}
-  , documents: {}
+  alias: {},
+  collections: {},
+  documents: {}
 }
 
 /**
