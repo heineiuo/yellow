@@ -1,1 +1,5 @@
+.DS_Store
+node_modules
+Thumb.db
+*.log*
 .idea
